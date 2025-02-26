@@ -19,3 +19,9 @@ We initially developed our local infracture on local deployments of the AWS Serv
 - Run `sam local start-api` to initialize the container and visit the link that the program prints out (for example: localhost:3000/hello)
 
 ![Screenshot of the terminal showing the endpoint URL for the function](assets/term.png)
+
+
+## Buckets for testing upload
+- https://ap-northeast-1.console.aws.amazon.com/s3/buckets/tokyotest334s25?region=ap-northeast-1&bucketType=general
+- https://eu-west-3.console.aws.amazon.com/s3/buckets/paristest334s25?region=eu-west-3&bucketType=general
+- https://us-east-1.console.aws.amazon.com/s3/buckets/s3testcs334s25?region=us-east-1&bucketType=general
