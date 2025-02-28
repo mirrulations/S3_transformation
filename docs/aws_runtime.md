@@ -58,3 +58,10 @@ These optimizations ensure that AWS S3 remains efficient even when handling larg
 
 - AWS S3 CopyObject Documentation: [docs.aws.amazon.com](https://docs.aws.amazon.com/AmazonS3/latest/userguide/copy-object.html?utm_source) :contentReference[oaicite:2]{index=2}  
 - AWS S3 Multipart Upload Overview: [docs.aws.amazon.com](https://docs.aws.amazon.com/AmazonS3/latest/userguide/mpuoverview.html?utm_source) :contentReference[oaicite:3]{index=3}
+
+## Rough Draft of Approximated Runtime on Mirrulations Bucket
+ - For 1.4 GBs of data it took 23.1 minutes
+ - Calculating for 2.2 TBs it would take approximatley 25.2 days
+   - 23.1 minutes/1.4 GBs = 16.5 minutes per GB
+   - 2,200 GBs(2.2 TBS) x 16.5 minutes = 36,300 minutes
+   - 36,300/60 = 605 hours, 605/24 = 25.2 days
