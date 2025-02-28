@@ -13,10 +13,10 @@ This script moves files in an S3 bucket to the correct Raw_data folder based on 
 s3 = boto3.client('s3')
 
 # Initialize S3Transfer with optimized settings
-transfer = S3Transfer(s3, TransferConfig(
-    multipart_threshold=50 * 1024 * 1024,  # Files larger than 50MB use multipart uploads
-    max_concurrency=16,  # Use up to 16 parallel threads for transfers
-))
+# transfer = S3Transfer(s3, TransferConfig(
+#     multipart_threshold=50 * 1024 * 1024,  # Files larger than 50MB use multipart uploads
+#     max_concurrency=16,  # Use up to 16 parallel threads for transfers
+# ))
 
 # Define your S3 bucket and folder names
 BUCKET_NAME = "s3testcs334s25"  # 🔹 Replace with your actual bucket name
