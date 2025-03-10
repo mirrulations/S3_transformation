@@ -36,6 +36,7 @@ def move_object(bucket_name, source_key, dest_key):
         print(f"✔ Moved: {source_key} -> {dest_key}")
         s3.delete_object(Bucket=bucket_name, Key=source_key)
         print(f"🗑 Deleted: {source_key}")
+        print(f"Success moving: {source_key}")
     except Exception as e:
         print(f"❌ Error moving {source_key}: {e}")
         
