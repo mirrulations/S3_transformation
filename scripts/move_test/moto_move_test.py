@@ -15,7 +15,7 @@ When running this file, you need to make sure to add S3. in front of the where o
 # Add the path to the transformation_trigger directory to the Python path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 
-from S3.move import (
+from scripts.move import (
     create_placeholder,
     create_raw_data_folder,
     move_object,

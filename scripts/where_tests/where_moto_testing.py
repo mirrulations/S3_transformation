@@ -8,7 +8,7 @@ import os
 import pytest
 import logging
 from moto import mock_aws
-from S3.where import (
+from scripts.where import (
     extract_agency_docket_folder,
     determine_raw_path,
     upload_file,
