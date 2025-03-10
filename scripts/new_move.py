@@ -36,8 +36,10 @@ def move_object(bucket_name, source_key, dest_key):
         print(f"✔ Moved: {source_key} -> {dest_key}")
         s3.delete_object(Bucket=bucket_name, Key=source_key)
         print(f"🗑 Deleted: {source_key}")
+        print(f"Success moving: {source_key}")
     except Exception as e:
         print(f"❌ Error moving {source_key}: {e}")
+        
 
 def process_file(bucket_name, file_key):
     if not file_key.startswith("Raw_data/") and not file_key.startswith("Derived_data/"):
@@ -48,7 +50,7 @@ def process_files(bucket_name):
     paginator = s3.get_paginator('list_objects_v2')
     page_iterator = paginator.paginate(Bucket=bucket_name, Prefix=SOURCE_PREFIX)
     
-    with ThreadPoolExecutor(max_workers=32) as executor:
+    with ThreadPoolExecutor(max_workers=64) as executor:
         for page in page_iterator:
             if 'Contents' in page:
                 for obj in page['Contents']:
