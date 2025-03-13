@@ -1,7 +1,12 @@
 import boto3
 import re
 import time
+import logging
 from concurrent.futures import ThreadPoolExecutor
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 s3 = boto3.client('s3')
 
@@ -14,9 +19,9 @@ def create_placeholder(bucket_name, key):
     """Creates a placeholder file in the specified folder."""
     try:
         s3.put_object(Bucket=bucket_name, Key=key, Body="This is a placeholder file.")
-        print(f"✔ Created placeholder in folder: {key}")
+        logger.info(f"✔ Created placeholder in folder: {key}")
     except Exception as e:
-        print(f"❌ Error creating placeholder: {e}")
+        logger.error(f"❌ Error creating placeholder: {e}")
 
 def create_raw_data_folder(bucket_name):
     """Ensures that Raw_data folder exists in the S3 bucket."""
@@ -24,9 +29,9 @@ def create_raw_data_folder(bucket_name):
     try:
         s3.put_object(Bucket=bucket_name, Key=raw_data_folder)
         create_placeholder(bucket_name, raw_data_folder + "placeholder.txt")
-        print(f"✔ Created Raw_data folder: {raw_data_folder}")
+        logger.info(f"✔ Created Raw_data folder: {raw_data_folder}")
     except Exception as e:
-        print(f"❌ Error creating Raw_data folder: {e}")
+        logger.error(f"❌ Error creating Raw_data folder: {e}")
 
 def create_derived_data_folder(bucket_name):
     """Ensures that Derived_data folder exists in the S3 bucket."""
@@ -34,20 +39,34 @@ def create_derived_data_folder(bucket_name):
     try:
         s3.put_object(Bucket=bucket_name, Key=derived_data_folder)
         create_placeholder(bucket_name, derived_data_folder + "placeholder.txt")
-        print(f"✔ Created Derived_data folder: {derived_data_folder}")
+        logger.info(f"✔ Created Derived_data folder: {derived_data_folder}")
     except Exception as e:
-        print(f"❌ Error creating Derived_data folder: {e}")
+        logger.error(f"❌ Error creating Derived_data folder: {e}")
 
 def move_object(bucket_name, source_key, dest_key):
     """Moves an object from the source to the destination in S3."""
     try:
         s3.copy_object(Bucket=bucket_name, CopySource={"Bucket": bucket_name, "Key": source_key}, Key=dest_key)
-        print(f"✔ Moved: {source_key} -> {dest_key}")
+        logger.info(f"✔ Moved: {source_key} -> {dest_key}")
         s3.delete_object(Bucket=bucket_name, Key=source_key)
-        print(f"🗑 Deleted: {source_key}")
-        print(f"Success moving: {source_key}")
+        logger.info(f"🗑 Deleted: {source_key}")
+        logger.info(f"Success moving: {source_key}")
+    except s3.exceptions.NoSuchBucket as e:
+        logger.error(f"❌ Error moving {source_key}: The specified bucket is not valid")
+        raise Exception("The specified bucket is not valid") from e
+    except s3.exceptions.NoSuchKey as e:
+        logger.error(f"❌ Error moving {source_key}: The specified key does not exist")
+        raise Exception("The specified key does not exist") from e
+    except s3.exceptions.ClientError as e:
+        if e.response['Error']['Code'] == 'AccessDenied':
+            logger.error(f"❌ Error moving {source_key}: Access Denied")
+            raise Exception("Access Denied") from e
+        else:
+            logger.error(f"❌ Error moving {source_key}: {e}")
+            raise Exception(f"ClientError: {e}") from e
     except Exception as e:
-        print(f"❌ Error moving {source_key}: {e}")
+        logger.error(f"❌ Error moving {source_key}: {e}")
+        raise Exception(f"❌ Error moving {source_key}: {e}")
 
 def determine_destination(file_key):
     """Determines the destination path based on the file's structure."""
@@ -69,9 +88,12 @@ def determine_destination(file_key):
 
 def process_file(bucket_name, file_key):
     """Processes a single file and moves it to the appropriate location."""
-    if not file_key.startswith(RAW_DATA_PREFIX) and not file_key.startswith(DERIVED_DATA_PREFIX):
-        dest_key = determine_destination(file_key)
-        move_object(bucket_name, file_key, dest_key)
+    try:
+        if not file_key.startswith(RAW_DATA_PREFIX) and not file_key.startswith(DERIVED_DATA_PREFIX):
+            dest_key = determine_destination(file_key)
+            move_object(bucket_name, file_key, dest_key)
+    except Exception as e:
+        logger.error(f"❌ Error processing file {file_key}: {e}")
 
 def process_files(bucket_name):
     """Processes all files in the S3 bucket using multithreading."""
@@ -86,7 +108,7 @@ def process_files(bucket_name):
                     executor.submit(process_file, bucket_name, file_key)
 
 def main():
-    print("🚀 Starting the script to move files and create folder structures.")
+    logger.info("🚀 Starting the script to move files and create folder structures.")
     
     start_time = time.time()  # Start timing
     
@@ -99,7 +121,7 @@ def main():
     end_time = time.time()  # End timing
     duration = end_time - start_time  # Calculate duration
     
-    print(f"✅ All tasks completed successfully in {duration:.2f} seconds.")
+    logger.info(f"✅ All tasks completed successfully in {duration:.2f} seconds.")
 
 if __name__ == "__main__":
     main()
