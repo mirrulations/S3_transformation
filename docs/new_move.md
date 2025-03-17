@@ -102,8 +102,17 @@ The code is designed to handle various errors gracefully:
     python3 -m pytest --log-cli-level=DEBUG new_moto_move_test.py
     ```
 
-## Run time with parallelization
-  - 
+## Approximated run time with parallelization
+  - Workers: 40
+  - run time on 6247 files - 30 seconds
+  - Rate: 
+    - 6247 files/30 seconds ≈ 208.23 files per second
+  - Estimated time for 28,000,000 files: 
+    - 28,000,000 files/ 208.23 files per second ≈ 134,450 seconds
+  - Converting to Hours and Days: 
+    - 134,450 seconds ≈ 2,240 minutes
+    - 2,240 minutes ≈ 37.3 hours
+    - 37.3 hours ≈ 1.55 days
 ---
 
 ## Conclusion
