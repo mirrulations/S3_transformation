@@ -236,7 +236,7 @@ Tests the generation and upload of attachment paths using the `get_attachment_js
 ### Running the Tests
 To run the tests, use the following command:
 ```bash
-pytest /Users/Leibenspergeramoravian.edu/Courses/334Cap/S3_transformation/mirrulations_pathgenerator/path_test/path_generator_test.py
+python3 -m pytest path_generator_test.py
 ```
 
 ---
