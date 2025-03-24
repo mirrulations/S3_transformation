@@ -4,7 +4,6 @@ import os
 import json
 from moto import mock_aws
 import sys
-import os
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 from mirrulations_pathgenerator.path_generator import PathGenerator
@@ -158,3 +157,31 @@ def test_pathgenerator_attachment_paths(s3_mock):
         response = s3_mock.list_objects_v2(Bucket="test-bucket", Prefix=path)
         assert "Contents" in response
         assert any(obj["Key"] == path for obj in response["Contents"])
+
+# Additional Tests
+def test_empty_json(s3_mock):
+    """Test handling of an empty JSON object."""
+    path_generator = PathGenerator()
+    json_data = {}
+
+    generated_path = path_generator.get_path(json_data)
+    expected_path = "unknown/unknown.json"
+    assert generated_path == expected_path
+
+def test_missing_agency_id(s3_mock):
+    """Test handling of JSON without an 'agencyId' key."""
+    path_generator = PathGenerator()
+    json_data = {
+        "data": {
+            "id": "USTR-2015-0010",
+            "type": "dockets",
+            "attributes": {
+                "docketId": "USTR-2015-0010"
+            }
+        }
+    }
+
+    agency_id, docket_id, item_id = path_generator.get_attributes(json_data, is_docket=True)
+    assert agency_id == "unknown"
+    assert docket_id == "USTR-2015-0010"
+    assert item_id is None
