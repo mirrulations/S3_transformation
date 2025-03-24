@@ -25,3 +25,6 @@ We initially developed our local infracture on local deployments of the AWS Serv
 - https://ap-northeast-1.console.aws.amazon.com/s3/buckets/tokyotest334s25?region=ap-northeast-1&bucketType=general
 - https://eu-west-3.console.aws.amazon.com/s3/buckets/paristest334s25?region=eu-west-3&bucketType=general
 - https://us-east-1.console.aws.amazon.com/s3/buckets/s3testcs334s25?region=us-east-1&bucketType=general
+
+## Bucket for testing Mirrulations change
+- https://us-east-1.console.aws.amazon.com/s3/buckets/s3fakecs334s25
