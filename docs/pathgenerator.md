@@ -18,20 +18,20 @@ The following methods were updated to align with the new data structure and impr
 - If a document is an htm file it prepends `/raw-data` to the generated path
 
 `_parse_attachment_path(self, json, file_format, attachments)`
-- If a file is an comment attachment their path is generated with `raw-data` prepended.
+- If a file is an comment attachment their path is generated with `/raw-data` prepended.
 
-5. New Data Structure
+## 3. New Data Structure
 The updated paths follow the new data structure:
 
-Dockets: 
-- /raw-data/{agencyId}/{docketId}/text-{docketId}/docket/{docketId}.json
+### Dockets: 
+- `/raw-data/{agencyId}/{docketId}/text-{docketId}/docket/{docketId}.json`
 
-Documents: 
-- /raw-data/{agencyId}/{docketId}/text-{docketId}/documents/{itemId}.json
-- /raw-data/{agencyId}/{docketId}/text-{docketId}/documents/{itemId}_content.htm
+### Documents: 
+- `/raw-data/{agencyId}/{docketId}/text-{docketId}/documents/{itemId}.json`
+- `/raw-data/{agencyId}/{docketId}/text-{docketId}/documents/{itemId}_content.htm`
 
-Comments: 
-- /raw-data/{agencyId}/{docketId}/text-{docketId}/comments/{itemId}.json
+### Comments: 
+- `/raw-data/{agencyId}/{docketId}/text-{docketId}/comments/{itemId}.json`
 
-Attachments: 
-- /raw-data/{agencyId}/{docketId}/binary-{docketId}/comments_attachments/{attachment_name}
+### Attachments: 
+- `/raw-data/{agencyId}/{docketId}/binary-{docketId}/comments_attachments/{attachment_name}`
