@@ -10,10 +10,10 @@ logger = logging.getLogger(__name__)
 
 s3 = boto3.client('s3')
 
-BUCKET_NAME = "s3fakecs334s25"
+BUCKET_NAME = "s3testcs334s25"
 SOURCE_PREFIX = ""
-RAW_DATA_PREFIX = "Raw_data/"
-DERIVED_DATA_PREFIX = "Derived_data/"
+RAW_DATA_PREFIX = "raw-data/"
+DERIVED_DATA_PREFIX = "derived-data/"
 
 def create_placeholder(bucket_name, key):
     """Creates a placeholder file in the specified folder."""
@@ -100,7 +100,7 @@ def process_files(bucket_name):
     paginator = s3.get_paginator('list_objects_v2')
     page_iterator = paginator.paginate(Bucket=bucket_name, Prefix=SOURCE_PREFIX)
     
-    with ThreadPoolExecutor(max_workers=64) as executor:
+    with ThreadPoolExecutor(max_workers=40) as executor:
         for page in page_iterator:
             if 'Contents' in page:
                 for obj in page['Contents']:
