@@ -49,7 +49,7 @@ class PathGenerator:
         if 'data' not in json or json['data'] == []:
             return "unknown/unknown.json"
         if json['data'].get("type") != -1:
-            return "Raw_data" + self.get_json_path(json)
+            return "/raw-data" + self.get_json_path(json)
         return "unknown/unknown.json"
 
     def _get_nested_keys_in_json(self, json_data, nested_keys, default_value):
@@ -122,7 +122,7 @@ class PathGenerator:
     def get_document_htm_path(self, json):
         agency_id, docket_id, item_id = self.get_attributes(json)
 
-        return f'/{agency_id}/{docket_id}/text-{docket_id}/' + \
+        return f'/raw-data/{agency_id}/{docket_id}/text-{docket_id}/' + \
                f'documents/{item_id}_content.htm'
 
     def get_comment_json_path(self, json):
@@ -141,8 +141,9 @@ class PathGenerator:
     def _parse_attachment_path(self, json, file_format, attachments):
         agency_i_d, docket_i_d, item_i_d = self.get_attributes(json)
         if "fileUrl" in file_format:
-            attachment_name = item_i_d + "_" + file_format["fileUrl"].split("/")[-1]
-            attachments.append(f'Raw_data/{agency_i_d}/{docket_i_d}/' +
+            attachment_name = item_i_d + "_" + \
+                file_format["fileUrl"].split("/")[-1]
+            attachments.append(f'/raw-data/{agency_i_d}/{docket_i_d}/' +
                                f'binary-{docket_i_d}/comments_' +
                                f'attachments/{attachment_name}')
         return attachments
@@ -150,7 +151,7 @@ class PathGenerator:
     def get_attachment_json_paths(self, json):
         '''
         Given a json, this function will return all attachment paths for
-        n number of attachment links.
+        n number attachment links
         '''
 
         # contains list of paths for attachments
@@ -159,7 +160,10 @@ class PathGenerator:
             attributes = attachment["attributes"]
             if self._has_file_formats(attributes, attachment):
                 for file_format in attributes["fileFormats"]:
-                    attachments = self._parse_attachment_path(json, file_format, attachments)
+                    attachments = self._parse_attachment_path(json,
+                                                              file_format,
+                                                              attachments)
+
         return attachments
 
     @staticmethod

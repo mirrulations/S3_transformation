@@ -61,10 +61,10 @@ def test_extract_agency_docket_folder():
 def test_determine_raw_path():
     logger.info("Starting test for determine_raw_path")
     try:
-        assert determine_raw_path("EPA-2024-12345.json", "docket", "json") == "Raw_data/EPA/EPA-2024-12345/text-EPA-2024-12345/dockets/EPA-2024-12345.json"
-        assert determine_raw_path("EPA-2024-12345-0002.json", "document", "json") == "Raw_data/EPA/EPA-2024-12345/text-EPA-2024-12345/documents/EPA-2024-12345-0002.json"
-        assert determine_raw_path("FWS-2024-56789-0001.json", "comment", "json") == "Raw_data/FWS/FWS-2024-56789/text-FWS-2024-56789/comments/FWS-2024-56789-0001.json"
-        assert determine_raw_path("FWS-R4-ES-2024-0154-0001_content.htm", "document", "htm") == "Raw_data/FWS/FWS-R4-ES-2024-0154/text-FWS-R4-ES-2024-0154/documents/FWS-R4-ES-2024-0154-0001_content.htm"
+        assert determine_raw_path("EPA-2024-12345.json", "docket", "json") == "raw-data/EPA/EPA-2024-12345/text-EPA-2024-12345/dockets/EPA-2024-12345.json"
+        assert determine_raw_path("EPA-2024-12345-0002.json", "document", "json") == "raw-data/EPA/EPA-2024-12345/text-EPA-2024-12345/documents/EPA-2024-12345-0002.json"
+        assert determine_raw_path("FWS-2024-56789-0001.json", "comment", "json") == "raw-data/FWS/FWS-2024-56789/text-FWS-2024-56789/comments/FWS-2024-56789-0001.json"
+        assert determine_raw_path("FWS-R4-ES-2024-0154-0001_content.htm", "document", "htm") == "raw-data/FWS/FWS-R4-ES-2024-0154/text-FWS-R4-ES-2024-0154/documents/FWS-R4-ES-2024-0154-0001_content.htm"
         logger.info("determine_raw_path tests passed")
     except AssertionError as e:
         logger.error("determine_raw_path test failed: %s", e)
@@ -74,7 +74,7 @@ def test_determine_raw_path():
 def test_upload_file(s3_mock):
     logger.info("Starting test for upload_file")
     file_name = "test_upload.json"
-    s3_path = "Raw_data/EPA/EPA-2024-12345/text-EPA-2024-12345/documents/test_upload.json"
+    s3_path = "raw-data/EPA/EPA-2024-12345/text-EPA-2024-12345/documents/test_upload.json"
 
     # Create a test file
     with open(file_name, "w") as f:
@@ -99,7 +99,7 @@ def test_upload_file(s3_mock):
 def test_process_file(s3_mock):
     logger.info("Starting test for process_file")
     input_file_name = "test_process_input.json"
-    s3_input_path = "Raw_data/EPA/EPA-2024-12345/text-EPA-2024-12345/documents/test_process_input.json"
+    s3_input_path = "raw-data/EPA/EPA-2024-12345/text-EPA-2024-12345/documents/test_process_input.json"
 
     # Create a test input file
     with open(input_file_name, "w") as f:
