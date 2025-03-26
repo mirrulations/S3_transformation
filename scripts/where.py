@@ -14,7 +14,7 @@ from botocore.exceptions import BotoCoreError, ClientError
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-RAW_PREFIX = 'Raw_data/'
+RAW_PREFIX = 'raw-data/'
 
 def is_comment_attachment(file_name):
     """

@@ -65,29 +65,29 @@ class TestWhere(unittest.TestCase):
     """
     def test_determine_raw_path(self):
         # Test docket, document, and comment file placement
-        expected = "Raw_data/EPA/EPA-2024-12345/text-EPA-2024-12345/dockets/EPA-2024-12345.json"
+        expected = "raw-data/EPA/EPA-2024-12345/text-EPA-2024-12345/dockets/EPA-2024-12345.json"
         actual = determine_raw_path("EPA-2024-12345.json", "docket", "json")
         print_test_result("test_determine_raw_path (Docket JSON)", expected, actual)
         self.assertEqual(expected, actual)
 
-        expected = "Raw_data/EPA/EPA-2024-12345/binary-EPA-2024-12345/documents_attachments/EPA-2024-12345-attachment.pdf"
+        expected = "raw-data/EPA/EPA-2024-12345/binary-EPA-2024-12345/documents_attachments/EPA-2024-12345-attachment.pdf"
         actual = determine_raw_path("EPA-2024-12345-attachment.pdf", "document", "pdf")
         print_test_result("test_determine_raw_path (Document Attachment PDF)", expected, actual)
         self.assertEqual(expected, actual)
 
-        expected = "Raw_data/EPA/EPA-2024-12345/text-EPA-2024-12345/documents/EPA-2024-12345-0001.json"
+        expected = "raw-data/EPA/EPA-2024-12345/text-EPA-2024-12345/documents/EPA-2024-12345-0001.json"
         actual = determine_raw_path("EPA-2024-12345-0001.json", "document", "json")
         print_test_result("test_determine_raw_path (Document JSON)", expected, actual)
         self.assertEqual(expected, actual)
 
         # Test `_content.htm` file placement
-        expected = "Raw_data/FWS/FWS-R4-ES-2024-0154/text-FWS-R4-ES-2024-0154/documents/FWS-R4-ES-2024-0154-0001_content.htm"
+        expected = "raw-data/FWS/FWS-R4-ES-2024-0154/text-FWS-R4-ES-2024-0154/documents/FWS-R4-ES-2024-0154-0001_content.htm"
         actual = determine_raw_path("FWS-R4-ES-2024-0154-0001_content.htm", "document", "htm")
         print_test_result("test_determine_raw_path (HTM Document)", expected, actual)
         self.assertEqual(expected, actual)
 
         # Test comment file placement
-        expected = "Raw_data/FWS/FWS-2024-56789/text-FWS-2024-56789/comments/FWS-2024-56789-0001.json"
+        expected = "raw-data/FWS/FWS-2024-56789/text-FWS-2024-56789/comments/FWS-2024-56789-0001.json"
         actual = determine_raw_path("FWS-2024-56789-0001.json", "comment", "json")
         print_test_result("test_determine_raw_path (Comment JSON)", expected, actual)
         self.assertEqual(expected, actual)
@@ -104,7 +104,7 @@ class TestWhere(unittest.TestCase):
 
         bucket_name = "test-bucket"
         file_name = "test_upload.txt"
-        s3_path = "Raw_data/EPA/EPA-2024-12345/text/test_upload.txt"
+        s3_path = "raw-data/EPA/EPA-2024-12345/text/test_upload.txt"
 
         # Create a test file
         with open(file_name, "w") as f:
