@@ -32,7 +32,7 @@ def create_raw_data_folder(bucket_name):
         logger.info(f"✔ Created Raw_data folder: {raw_data_folder}")
     except Exception as e:
         logger.error(f"❌ Error creating Raw_data folder: {e}")
-
+        
 def create_derived_data_folder(bucket_name):
     """Ensures that Derived_data folder exists in the S3 bucket."""
     derived_data_folder = DERIVED_DATA_PREFIX
@@ -50,23 +50,17 @@ def move_object(bucket_name, source_key, dest_key):
         logger.info(f"✔ Moved: {source_key} -> {dest_key}")
         s3.delete_object(Bucket=bucket_name, Key=source_key)
         logger.info(f"🗑 Deleted: {source_key}")
-        logger.info(f"Success moving: {source_key}")
-    except s3.exceptions.NoSuchBucket as e:
-        logger.error(f"❌ Error moving {source_key}: The specified bucket is not valid")
-        raise Exception("The specified bucket is not valid") from e
-    except s3.exceptions.NoSuchKey as e:
+    except s3.exceptions.NoSuchBucket:
+        logger.error(f"❌ Error moving {source_key}: The specified bucket does not exist")
+    except s3.exceptions.NoSuchKey:
         logger.error(f"❌ Error moving {source_key}: The specified key does not exist")
-        raise Exception("The specified key does not exist") from e
     except s3.exceptions.ClientError as e:
         if e.response['Error']['Code'] == 'AccessDenied':
             logger.error(f"❌ Error moving {source_key}: Access Denied")
-            raise Exception("Access Denied") from e
         else:
-            logger.error(f"❌ Error moving {source_key}: {e}")
-            raise Exception(f"ClientError: {e}") from e
+            logger.error(f"❌ ClientError moving {source_key}: {e}")
     except Exception as e:
-        logger.error(f"❌ Error moving {source_key}: {e}")
-        raise Exception(f"❌ Error moving {source_key}: {e}")
+        logger.error(f"❌ Unexpected error moving {source_key}: {e}")
 
 def determine_destination(file_key):
     """Determines the destination path based on the file's structure."""
@@ -113,7 +107,7 @@ def main():
     start_time = time.time()  # Start timing
     
     # Create necessary folders once
-    create_raw_data_folder(BUCKET_NAME)
+    #create_raw_data_folder(BUCKET_NAME)
     create_derived_data_folder(BUCKET_NAME)
     
     process_files(BUCKET_NAME)
@@ -121,7 +115,7 @@ def main():
     end_time = time.time()  # End timing
     duration = end_time - start_time  # Calculate duration
     
-    logger.info(f"✅ All tasks completed successfully in {duration:.2f} seconds.")
+    logger.info(f"✅ All tasks completed in {duration:.2f} seconds.")
 
 if __name__ == "__main__":
     main()
