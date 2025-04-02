@@ -5,9 +5,27 @@ import logging
 from concurrent.futures import ThreadPoolExecutor
 
 # Configure logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+log_formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
+file_output_handler = logging.FileHandler('script_output.log')
+file_output_handler.setLevel(logging.INFO)
+file_output_handler.setFormatter(log_formatter)
+
+error_output_handler = logging.FileHandler('error_output.log')
+error_output_handler.setLevel(logging.ERROR)
+error_output_handler.setFormatter(log_formatter)
+
+console_output_handler = logging.StreamHandler()
+console_output_handler.setLevel(logging.INFO)
+console_output_handler.setFormatter(log_formatter)
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+logger.addHandler(file_output_handler)
+logger.addHandler(error_output_handler)
+logger.addHandler(console_output_handler)
+
+# Initialize S3 client
 s3 = boto3.client('s3')
 
 BUCKET_NAME = "s3testcs334s25"
@@ -107,7 +125,7 @@ def main():
     start_time = time.time()  # Start timing
     
     # Create necessary folders once
-    #create_raw_data_folder(BUCKET_NAME)
+    create_raw_data_folder(BUCKET_NAME)
     create_derived_data_folder(BUCKET_NAME)
     
     process_files(BUCKET_NAME)
