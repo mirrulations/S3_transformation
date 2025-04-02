@@ -33,6 +33,7 @@ SOURCE_PREFIX = ""
 RAW_DATA_PREFIX = "raw-data/"
 DERIVED_DATA_PREFIX = "derived-data/"
 
+# Create a placeholder file in the specified folder
 def create_placeholder(bucket_name, key):
     """Creates a placeholder file in the specified folder."""
     try:
