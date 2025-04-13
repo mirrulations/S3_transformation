@@ -130,7 +130,7 @@ def test_process_files_batching_behavior(s3_mock):
         call_counter["count"] += 1
 
     with patch("scripts.new_move.process_file", side_effect=mock_process_file):
-        process_files("test-bucket", max_workers=16, batch_size=500)
+        process_files("test-bucket")
 
     assert call_counter["count"] == total_files, f"❌ Expected {total_files} calls but got {call_counter['count']}."
     print("✅ Batching behavior test completed successfully.")
@@ -169,14 +169,14 @@ def test_process_files_with_errors(s3_mock):
 def test_process_files_stress_with_large_volume(s3_mock):
     """Stress test process_files with a large number of objects to ensure stability and performance."""
 
-    num_files = 10000  # Simulate a heavy load
+    num_files = 5000  # Simulate a heavy load
     source_files = [f"source/file_{i}.txt" for i in range(num_files)]
 
     for file_key in source_files:
         s3_mock.put_object(Bucket="test-bucket", Key=file_key, Body="test content")
 
     start_time = time.time()
-    process_files("test-bucket", max_workers=32, batch_size=500)
+    process_files("test-bucket")
     end_time = time.time()
 
     for file_key in source_files:

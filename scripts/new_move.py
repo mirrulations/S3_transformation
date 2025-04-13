@@ -121,7 +121,9 @@ def batch_iterable(iterable, batch_size):
             break
         yield batch
 
-def process_files(bucket_name, max_workers=20, batch_size=500):
+def process_files(bucket_name):
+    max_workers = 20
+    batch_size = 500
     paginator = s3.get_paginator('list_objects_v2')
     page_iterator = paginator.paginate(Bucket=bucket_name, Prefix=SOURCE_PREFIX)
 
@@ -148,7 +150,7 @@ def main():
     # create_raw_data_folder(BUCKET_NAME)
     # create_derived_data_folder(BUCKET_NAME)
     
-    process_files(BUCKET_NAME, max_workers=20, batch_size=500)
+    process_files(BUCKET_NAME)
     
     end_time = time.time()  # End timing
     duration = end_time - start_time  # Calculate duration
