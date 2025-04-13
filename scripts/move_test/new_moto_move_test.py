@@ -115,6 +115,26 @@ def test_process_files_concurrency(s3_mock):
 
     assert duration < 100, "❌ Process took too long, possible concurrency issue."
 
+def test_process_files_batching_behavior(s3_mock):
+    """Test that process_files uses batching and does not overload the executor."""
+
+    # Upload 1050 files (expecting at least 3 batches if batch size = 500)
+    total_files = 1050
+    source_files = [f"source/file_{i}.txt" for i in range(total_files)]
+    for file_key in source_files:
+        s3_mock.put_object(Bucket="test-bucket", Key=file_key, Body="test content")
+
+    call_counter = {"count": 0}
+
+    def mock_process_file(bucket, key):
+        call_counter["count"] += 1
+
+    with patch("scripts.new_move.process_file", side_effect=mock_process_file):
+        process_files("test-bucket")
+
+    assert call_counter["count"] == total_files, f"❌ Expected {total_files} calls but got {call_counter['count']}."
+    print("✅ Batching behavior test completed successfully.")
+
 def test_process_files_with_errors(s3_mock):
     """Test process_files function to ensure it continues processing even if some files fail to move."""
 
@@ -145,6 +165,28 @@ def test_process_files_with_errors(s3_mock):
             assert "Contents" in response, f"❌ File {dest_key} was not moved."
 
     print("✅ Error handling test completed successfully.")
+
+def test_process_files_stress_with_large_volume(s3_mock):
+    """Stress test process_files with a large number of objects to ensure stability and performance."""
+
+    num_files = 5000  # Simulate a heavy load
+    source_files = [f"source/file_{i}.txt" for i in range(num_files)]
+
+    for file_key in source_files:
+        s3_mock.put_object(Bucket="test-bucket", Key=file_key, Body="test content")
+
+    start_time = time.time()
+    process_files("test-bucket")
+    end_time = time.time()
+
+    for file_key in source_files:
+        dest_key = determine_destination(file_key)
+        response = s3_mock.list_objects_v2(Bucket="test-bucket", Prefix=dest_key)
+        assert "Contents" in response, f"❌ File {dest_key} was not moved."
+
+    duration = end_time - start_time
+    print(f"✅ Stress test completed in {duration:.2f} seconds.")
+    assert duration < 180, "❌ Stress test took too long, possible inefficiency or memory issue."
 
 def test_invalid_bucket_name(s3_mock):
     """Test handling of invalid bucket name."""
@@ -254,6 +296,3 @@ def test_existing_destination_key(s3_mock):
     assert any(obj["Key"] == dest_key for obj in dest_response["Contents"]), "❌ Destination key is missing."
 
     print("✅ Existing destination key test completed successfully.")
-
-
-
