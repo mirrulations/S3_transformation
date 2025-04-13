@@ -3,6 +3,8 @@ import re
 import time
 import logging
 from concurrent.futures import ThreadPoolExecutor
+from itertools import islice
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 # Configure logging
 log_formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -93,7 +95,7 @@ def determine_destination(file_key):
     if extracted_text_match:
         extracted_text_root = extracted_text_match.group(0)  # Capture the folder containing "extracted_text"
         extracted_text_path = remaining_path.split(extracted_text_root + "/", 1)[1]  # Preserve subpath after extracted_text folder
-        derived_dest = f"{DERIVED_DATA_PREFIX}{agency}/{docket_id}/Mirrulations/extracted_txt/{extracted_text_root}/{extracted_text_path}"
+        derived_dest = f"{DERIVED_DATA_PREFIX}{agency}/{docket_id}/mirrulations/extracted_txt/{extracted_text_root}/{extracted_text_path}"
         return derived_dest
 
     # If not extracted_text, send to Raw_data
@@ -108,17 +110,34 @@ def process_file(bucket_name, file_key):
     except Exception as e:
         logger.error(f"❌ Error processing file {file_key}: {e}")
 
-def process_files(bucket_name):
-    """Processes all files in the S3 bucket using multithreading."""
+
+
+def batch_iterable(iterable, batch_size):
+    """Yield successive batches from iterable."""
+    iterator = iter(iterable)
+    while True:
+        batch = list(islice(iterator, batch_size))
+        if not batch:
+            break
+        yield batch
+
+def process_files(bucket_name, max_workers=20, batch_size=500):
     paginator = s3.get_paginator('list_objects_v2')
     page_iterator = paginator.paginate(Bucket=bucket_name, Prefix=SOURCE_PREFIX)
-    
-    with ThreadPoolExecutor(max_workers=40) as executor:
+
+    with ThreadPoolExecutor(max_workers=max_workers) as executor:
         for page in page_iterator:
             if 'Contents' in page:
-                for obj in page['Contents']:
-                    file_key = obj['Key']
-                    executor.submit(process_file, bucket_name, file_key)
+                file_keys = [obj['Key'] for obj in page['Contents']]
+
+                for batch in batch_iterable(file_keys, batch_size):
+                    futures = [executor.submit(process_file, bucket_name, key) for key in batch]
+
+                    for future in as_completed(futures):
+                        try:
+                            future.result()
+                        except Exception as e:
+                            logger.error(f"❌ Exception in thread execution: {e}")
 
 def main():
     logger.info("🚀 Starting the script to move files and create folder structures.")
@@ -126,10 +145,10 @@ def main():
     start_time = time.time()  # Start timing
     
     # Create necessary folders once
-    create_raw_data_folder(BUCKET_NAME)
-    create_derived_data_folder(BUCKET_NAME)
+    # create_raw_data_folder(BUCKET_NAME)
+    # create_derived_data_folder(BUCKET_NAME)
     
-    process_files(BUCKET_NAME)
+    process_files(BUCKET_NAME, max_workers=20, batch_size=500)
     
     end_time = time.time()  # End timing
     duration = end_time - start_time  # Calculate duration
